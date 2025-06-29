@@ -41,3 +41,5 @@ tsconfig.node.json
 .editorconfig
 .vite.config.ts
 .gitattributes
+index.css
+output.css
