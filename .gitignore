@@ -40,3 +40,4 @@ tsconfig.node.json
 .prettierrc.json
 .editorconfig
 .vite.config.ts
+.gitattributes
