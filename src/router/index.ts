@@ -4,6 +4,18 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/login',
     component: () => import('@/views/login/IndexView.vue')
+  },
+  {
+    path: '/student',
+    component: () => import('@/views/student/IndexView.vue')
+  },
+  {
+    path: '/teacher',
+    component: () => import('@/views/teacher/IndexView.vue')
+  },
+  {
+    path: '/admin',
+    component: () => import('@/views/admin/IndexView.vue')
   }
 ]
 
