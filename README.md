@@ -1,6 +1,6 @@
 # Vue-Graduation-Project-Process-Management
 
-毕业设计管理系统的前端代码，多多练习
+毕业设计管理系统的前端代码，第一次尝试，多多练习
 
 ### Development Tools
 
