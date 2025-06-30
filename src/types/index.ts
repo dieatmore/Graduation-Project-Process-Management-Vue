@@ -37,3 +37,10 @@ export interface Teacher {
   B?: number
   C?: number
 }
+
+export interface Department {
+  id?: string
+  name?: string
+  updateTime?: string
+  insertTime?: string
+}

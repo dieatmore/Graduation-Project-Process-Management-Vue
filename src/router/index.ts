@@ -15,7 +15,18 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/admin',
-    component: () => import('@/views/admin/IndexView.vue')
+    redirect: '/departmentmanage',
+    component: () => import('@/views/admin/IndexView.vue'),
+    children: [
+      {
+        path: '/departmentmanage',
+        component: () => import('@/views/admin/DepartmentManage.vue')
+      },
+      {
+        path: '/teachermanage',
+        component: () => import('@/views/admin/TeacherManage.vue')
+      }
+    ]
   }
 ]
 

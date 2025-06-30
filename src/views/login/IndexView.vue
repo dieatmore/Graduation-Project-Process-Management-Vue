@@ -65,7 +65,6 @@ const handleLogin = async () => {
     if (!formRule) return
     const { execute } = login(form.value)
     const res = await execute()
-
     if (res.data.value?.code == 200) {
       ElMessage.success('登录成功')
       const role = res.data.value.data.role
