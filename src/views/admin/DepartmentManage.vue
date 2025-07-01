@@ -25,25 +25,58 @@
           </el-button>
         </el-form-item>
         <el-form-item>
-          <el-button type="success" class="flex ml-4">
+          <el-button type="success" class="flex ml-4" @click="openDialog">
             <Plus style="width: 1em; height: 1em; margin-right: 4px" />
             新增专业
           </el-button>
         </el-form-item>
       </el-form>
+
+      <!-- 新增专业dialog -->
+      <el-dialog v-model="dialogFormVisible" title="新增专业" width="400">
+        <el-form :model="addForm">
+          <el-form-item label="专业名称">
+            <el-input v-model="addForm.name" autocomplete="off" />
+          </el-form-item>
+        </el-form>
+        <template #footer>
+          <span class="dialog-footer">
+            <el-button @click="dialogFormVisible = false">取消</el-button>
+            <el-button type="primary" @click="handleConfirm" :loading="submitting">确认</el-button>
+          </span>
+        </template>
+      </el-dialog>
     </div>
     <!-- 专业列表 -->
     <div
       class="w-full h-[85%] mt-8 bg-white border-gray shadow-sm rounded-xl"
       style="border-width: 1px">
-      <el-table :data="departmentList" stripe style="width: 100%" height="680">
+      <el-table
+        :data="departmentList"
+        stripe
+        style="width: 100%"
+        height="680"
+        empty-text="暂无专业数据，请添加或刷新">
         <el-table-column prop="id" label="专业ID" width="350" />
         <el-table-column prop="name" label="专业名称" />
         <el-table-column prop="updateTime" label="创建时间" width="350" :formatter="formatDate" />
-        <el-table-column label="操作" width="200">
+        <el-table-column label="操作" width="350">
           <template #default="scope">
-            <el-button size="small" @click="handleEdit(scope.row)">导入教师</el-button>
-            <el-button size="small" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+            <el-upload
+              class="upload-demo"
+              action
+              :auto-upload="false"
+              accept=".xlsx,.xls"
+              style="margin-right: 8px; margin-top: 10px">
+              <el-button>
+                <Download style="width: 1em; height: 1em; margin-right: 4px" />
+                导入教师
+              </el-button>
+            </el-upload>
+            <el-button type="danger" @click="handleDelete(scope.row.id)" :loading="deleting">
+              <DeleteFilled style="width: 1em; height: 1em; margin-right: 4px" />
+              删除
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -51,18 +84,55 @@
   </div>
 </template>
 <script setup lang="ts">
-import { getDepartmentList, getSearchDepartment } from '@/api/admin'
+import {
+  addDepartment,
+  deleteDepartment,
+  getDepartmentList,
+  getSearchDepartment
+} from '@/api/admin'
 import { formatDate } from '@/services'
 import type { Department } from '@/types'
-import { Plus, RefreshRight, Search } from '@element-plus/icons-vue'
+import { DeleteFilled, Download, Plus, RefreshRight, Search } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { onMounted, ref } from 'vue'
 
 const departmentList = ref<Department[]>([])
 
+const dialogFormVisible = ref(false)
+
 const formInline = ref({
   departmentName: ''
 })
+
+const addForm = ref({
+  name: ''
+})
+
+const submitting = ref(false)
+const deleting = ref(false)
+
+// 添加专业
+const handleConfirm = async () => {
+  submitting.value = true
+  try {
+    const { execute } = addDepartment(addForm.value)
+    const res = await execute()
+    dialogFormVisible.value = false
+    ElMessage.success('添加成功')
+    // 刷新列表数据
+    getDepartment()
+  } catch (error) {
+    console.error(error)
+    ElMessage.error('添加失败')
+  } finally {
+    submitting.value = false
+  }
+}
+
+const openDialog = () => {
+  dialogFormVisible.value = true
+  addForm.value.name = ''
+}
 
 const onSubmit = async () => {
   if (!formInline.value.departmentName) {
@@ -86,8 +156,23 @@ const handleEdit = (row: any) => {
   console.log('编辑行数据:', row)
 }
 
-const handleDelete = (row: any) => {
-  console.log('删除行数据:', row)
+// 删除专业
+const handleDelete = async (id: string) => {
+  deleting.value = true
+  try {
+    const { execute } = deleteDepartment(id)
+    const res = await execute()
+    if (res.data.value?.code == 200) {
+      ElMessage.success('删除成功')
+    } else ElMessage.error(res.data.value?.message)
+    // 刷新列表数据
+    getDepartment()
+  } catch (error: any) {
+    console.error(error)
+    ElMessage.error(error)
+  } finally {
+    deleting.value = false
+  }
 }
 
 // 获取专业列表数据
@@ -109,5 +194,10 @@ onMounted(async () => {
 <style scoped>
 ::v-deep .el-table .cell {
   text-align: center;
+}
+::v-deep .el-table .cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>

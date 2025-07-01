@@ -6,8 +6,8 @@
         <el-col :span="4" :offset="1">
           <img src="../../assets/images/schoolbadge.png" alt="校徽" class="object-cover h-11" />
         </el-col>
-        <el-col :span="7" :offset="6">
-          <span class="font-bold text-4xl font-cursive">后台管理</span>
+        <el-col :span="8" :offset="5">
+          <span class="font-bold text-4xl font-cursive">毕业设计管理系统</span>
         </el-col>
         <el-col :span="4" :offset="1">
           <div class="flex items-center justify-end">

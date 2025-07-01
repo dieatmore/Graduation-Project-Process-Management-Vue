@@ -29,3 +29,34 @@ export const getSearchDepartment = (departmentName: string) => {
     }
   )
 }
+
+// 添加专业
+export const addDepartment = (params: Department) => {
+  return useAxios<ResultVO<Department>>(
+    'admin/departments',
+    {
+      method: 'POST',
+      data: {
+        name: params.name
+      }
+    },
+    service,
+    {
+      immediate: false
+    }
+  )
+}
+
+// 删除专业
+export const deleteDepartment = (departmentId: string) => {
+  return useAxios<ResultVO<Department[]>>(
+    `admin/departments/${departmentId}`,
+    {
+      method: 'DELETE'
+    },
+    service,
+    {
+      immediate: false
+    }
+  )
+}

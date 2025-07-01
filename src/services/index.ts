@@ -1,3 +1,4 @@
+// 日期格式化
 export const formatDate = (row: any) => {
   const date = new Date(row.updateTime)
   return date
