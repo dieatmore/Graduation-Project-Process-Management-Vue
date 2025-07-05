@@ -1,4 +1,4 @@
-import type { Department, ResultVO } from '@/types'
+import type { Department, ResultVO, User } from '@/types'
 import service from '@/utils/request'
 import { useAxios } from '@vueuse/integrations/useAxios'
 
@@ -53,6 +53,25 @@ export const deleteDepartment = (departmentId: string) => {
     `admin/departments/${departmentId}`,
     {
       method: 'DELETE'
+    },
+    service,
+    {
+      immediate: false
+    }
+  )
+}
+
+// 导入教师
+export const addTeachers = (params: any, departmentId: string) => {
+  return useAxios<ResultVO<User>>(
+    `admin/teachers/${departmentId}`,
+    {
+      method: 'POST',
+      data: params.map((item: any) => ({
+        name: item.name,
+        number: item.number,
+        password: ''
+      }))
     },
     service,
     {

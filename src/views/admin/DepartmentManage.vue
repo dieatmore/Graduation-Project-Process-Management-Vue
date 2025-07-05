@@ -62,17 +62,10 @@
         <el-table-column prop="updateTime" label="创建时间" width="350" :formatter="formatDate" />
         <el-table-column label="操作" width="350">
           <template #default="scope">
-            <el-upload
-              class="upload-demo"
-              action
-              :auto-upload="false"
-              accept=".xlsx,.xls"
-              style="margin-right: 8px; margin-top: 10px">
-              <el-button>
-                <Download style="width: 1em; height: 1em; margin-right: 4px" />
-                导入教师
-              </el-button>
-            </el-upload>
+            <el-button @click="openForm(scope.row.id)">
+              <Download style="width: 1em; height: 1em; margin-right: 4px" plain />
+              导入教师
+            </el-button>
             <el-button type="danger" @click="handleDelete(scope.row.id)" :loading="deleting">
               <DeleteFilled style="width: 1em; height: 1em; margin-right: 4px" />
               删除
@@ -82,6 +75,7 @@
       </el-table>
     </div>
   </div>
+  <TeacherFile ref="formRef" />
 </template>
 <script setup lang="ts">
 import {
@@ -95,10 +89,17 @@ import type { Department } from '@/types'
 import { DeleteFilled, Download, Plus, RefreshRight, Search } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { onMounted, ref } from 'vue'
+import TeacherFile from './TeacherFile.vue'
 
 const departmentList = ref<Department[]>([])
 
 const dialogFormVisible = ref(false)
+
+/** 添加/修改操作 */
+const formRef = ref()
+const openForm = (id: string) => {
+  formRef.value.open(id)
+}
 
 const formInline = ref({
   departmentName: ''
@@ -129,11 +130,13 @@ const handleConfirm = async () => {
   }
 }
 
+// 新增专业
 const openDialog = () => {
   dialogFormVisible.value = true
   addForm.value.name = ''
 }
 
+// 搜索专业
 const onSubmit = async () => {
   if (!formInline.value.departmentName) {
     ElMessage.warning('请输入部门名称') // 空值校验
@@ -150,10 +153,6 @@ const onSubmit = async () => {
   } catch (e: any) {
     ElMessage.error('搜索失败: ' + e.message)
   }
-}
-
-const handleEdit = (row: any) => {
-  console.log('编辑行数据:', row)
 }
 
 // 删除专业
@@ -194,10 +193,5 @@ onMounted(async () => {
 <style scoped>
 ::v-deep .el-table .cell {
   text-align: center;
-}
-::v-deep .el-table .cell {
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 </style>
