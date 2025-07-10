@@ -181,6 +181,7 @@ const getDepartment = async () => {
     if (data.value?.data) {
       departmentList.value = data.value.data
     }
+    console.log(data)
   } catch (e: any) {
     ElMessage.error('获取数据失败:', e)
   }

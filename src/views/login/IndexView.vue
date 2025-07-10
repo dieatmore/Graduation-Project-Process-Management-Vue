@@ -40,42 +40,52 @@
   </el-row>
 </template>
 <script setup lang="ts">
-import { login } from '@/api/login'
-import { Role } from '@/types'
-import { Lock, User } from '@element-plus/icons-vue'
+import { loginService } from '@/services/LoginService'
+import type { User } from '@/types'
+import { Lock } from '@element-plus/icons-vue'
 import type { FormInstance } from 'element-plus'
-import { ElMessage } from 'element-plus'
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 
-const router = useRouter()
-
-const form = ref({
-  number: '',
-  password: ''
-})
+const form = ref<User>({})
 const loading = ref(false)
 const formRef = ref<FormInstance>()
 
-// 登录
+// 登录(useAxios)
+// const handleLogin = async () => {
+//   try {
+//     loading.value = true
+//     const formRule = await formRef.value?.validate()
+//     if (!formRule) return
+//     const { execute } = login(form.value)
+//     const res = await execute()
+//     if (res.data.value?.code == 200) {
+//       ElMessage.success('登录成功')
+//       const role = res.data.value.data.role
+//       if (role == Role.STUDENT) router.push('/student')
+//       else if (role == Role.TEACHER) router.push('/teacher')
+//       else if (role == Role.ADMIN) router.push('admin')
+//     } else {
+//       ElMessage.error(res.data.value?.message || '登录失败')
+//     }
+//   } catch (err) {
+//     console.error('登录错误:', err)
+//   } finally {
+//     loading.value = false
+//   }
+// }
+
+// 登录(Axios)
 const handleLogin = async () => {
   try {
     loading.value = true
     const formRule = await formRef.value?.validate()
     if (!formRule) return
-    const { execute } = login(form.value)
-    const res = await execute()
-    if (res.data.value?.code == 200) {
-      ElMessage.success('登录成功')
-      const role = res.data.value.data.role
-      if (role == Role.STUDENT) router.push('/student')
-      else if (role == Role.TEACHER) router.push('/teacher')
-      else if (role == Role.ADMIN) router.push('admin')
-    } else {
-      ElMessage.error(res.data.value?.message || '登录失败')
-    }
+    await loginService({
+      number: form.value.number,
+      password: form.value.password
+    })
   } catch (err) {
-    console.error('登录错误:', err)
+    throw '登录失败'
   } finally {
     loading.value = false
   }
