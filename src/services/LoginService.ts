@@ -1,8 +1,9 @@
-import router from '@/router'
+import axios from '@/axios'
+import { useMessage } from '@/components/message'
 import { useUserStore } from '@/stores/UserStore'
 import type { ResultVO, User } from '@/types'
-import { Role } from '@/types'
-import axios from 'axios'
+
+const message = useMessage()
 
 export const loginService = async (user: User) => {
   // 封装的usePost只返回resp.data.data，不包含token
@@ -11,21 +12,9 @@ export const loginService = async (user: User) => {
   const token = resp.headers.token
   const role = resp.headers.role
   if (!data || !token || !role) {
-    throw '登录错误'
+    message.error('登录错误')
   }
   sessionStorage.setItem('token', token)
   useUserStore().setUser(data)
-  let path = ''
-  switch (role) {
-    case Role.ADMIN:
-      path = '/admin'
-      break
-    case Role.STUDENT:
-      path = '/student'
-      break
-    case Role.TEACHER:
-      path = '/teacher'
-      break
-  }
-  router.push(path)
+  return resp
 }

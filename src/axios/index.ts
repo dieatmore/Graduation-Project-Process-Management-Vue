@@ -4,7 +4,7 @@ import axios from 'axios'
 axios.defaults.baseURL = '/api/'
 
 // Axios拦截器是全局配置，仅初始化一次，所以外部
-const tokenStorage = localStorage.getItem('token')
+const tokenStorage = sessionStorage.getItem('token')
 
 // Axios请求配置：注入token
 axios.interceptors.request.use(
@@ -23,8 +23,17 @@ axios.interceptors.request.use(
 // Axios响应配置
 axios.interceptors.response.use(
   resp => {
+    const data: ResultVO<{}> = resp.data
+    if (data.code < 300) {
+      return resp
+    }
+
+    if (data.code >= 400) {
+      return Promise.reject(data.message)
+    }
     return resp
   },
+  // 全局处理异常信息。即，http状态码不是200
   error => {
     return Promise.reject(error.message)
   }

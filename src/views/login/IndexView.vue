@@ -40,52 +40,47 @@
   </el-row>
 </template>
 <script setup lang="ts">
+import { useMessage } from '@/components/message'
+import router from '@/router'
 import { loginService } from '@/services/LoginService'
 import type { User } from '@/types'
+import { Role } from '@/types'
 import { Lock } from '@element-plus/icons-vue'
 import type { FormInstance } from 'element-plus'
 import { ref } from 'vue'
 
+const message = useMessage()
 const form = ref<User>({})
 const loading = ref(false)
 const formRef = ref<FormInstance>()
 
-// 登录(useAxios)
-// const handleLogin = async () => {
-//   try {
-//     loading.value = true
-//     const formRule = await formRef.value?.validate()
-//     if (!formRule) return
-//     const { execute } = login(form.value)
-//     const res = await execute()
-//     if (res.data.value?.code == 200) {
-//       ElMessage.success('登录成功')
-//       const role = res.data.value.data.role
-//       if (role == Role.STUDENT) router.push('/student')
-//       else if (role == Role.TEACHER) router.push('/teacher')
-//       else if (role == Role.ADMIN) router.push('admin')
-//     } else {
-//       ElMessage.error(res.data.value?.message || '登录失败')
-//     }
-//   } catch (err) {
-//     console.error('登录错误:', err)
-//   } finally {
-//     loading.value = false
-//   }
-// }
-
 // 登录(Axios)
 const handleLogin = async () => {
+  // loginService内跳转，如果try，catch，finally则路径变但页面不跳转
+  const formRule = await formRef.value?.validate()
+  if (!formRule) return
   try {
     loading.value = true
-    const formRule = await formRef.value?.validate()
-    if (!formRule) return
-    await loginService({
+    const resp = await loginService({
       number: form.value.number,
       password: form.value.password
     })
-  } catch (err) {
-    throw '登录失败'
+    const role = resp.headers.role
+    let path = ''
+    switch (role) {
+      case Role.ADMIN:
+        path = '/admin'
+        break
+      case Role.STUDENT:
+        path = '/student'
+        break
+      case Role.TEACHER:
+        path = '/teacher'
+        break
+    }
+    if (resp.data.code == 200) router.push(path)
+  } catch (err: any) {
+    message.error(err)
   } finally {
     loading.value = false
   }

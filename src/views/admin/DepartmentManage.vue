@@ -19,7 +19,7 @@
           </el-button>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="getDepartment">
+          <el-button type="primary" @click="resetSearch">
             <RefreshRight style="width: 1em; height: 1em; margin-right: 4px" />
             重置
           </el-button>
@@ -78,21 +78,27 @@
   <TeacherFile ref="formRef" />
 </template>
 <script setup lang="ts">
-import {
-  addDepartment,
-  deleteDepartment,
-  getDepartmentList,
-  getSearchDepartment
-} from '@/api/admin'
+import { useGet } from '@/axios'
+import { useMessage } from '@/components/message'
 import { formatDate } from '@/services'
+import {
+  addDepartmentService,
+  deleteDepartmentService,
+  departmentListService,
+  searchDepartmentService
+} from '@/services/AdminService'
+import { useDepartmentStore } from '@/stores/DepartmentStore'
 import type { Department } from '@/types'
 import { DeleteFilled, Download, Plus, RefreshRight, Search } from '@element-plus/icons-vue'
-import { ElMessage } from 'element-plus'
 import { onMounted, ref } from 'vue'
 import TeacherFile from './TeacherFile.vue'
 
-const departmentList = ref<Department[]>([])
+const departmentStore = useDepartmentStore()
 
+// 直接绑定到 store 中的数据
+let departmentList = departmentStore.departmentsS
+console.log(departmentStore.departmentsS)
+const message = useMessage()
 const dialogFormVisible = ref(false)
 
 /** 添加/修改操作 */
@@ -116,15 +122,11 @@ const deleting = ref(false)
 const handleConfirm = async () => {
   submitting.value = true
   try {
-    const { execute } = addDepartment(addForm.value)
-    const res = await execute()
+    const res = await addDepartmentService(addForm.value)
     dialogFormVisible.value = false
-    ElMessage.success('添加成功')
-    // 刷新列表数据
-    getDepartment()
+    message.success('添加成功')
   } catch (error) {
-    console.error(error)
-    ElMessage.error('添加失败')
+    message.error('添加失败')
   } finally {
     submitting.value = false
   }
@@ -139,58 +141,49 @@ const openDialog = () => {
 // 搜索专业
 const onSubmit = async () => {
   if (!formInline.value.departmentName) {
-    ElMessage.warning('请输入部门名称') // 空值校验
+    message.warning('请输入部门名称') // 空值校验
     return
   }
   try {
-    const { execute } = getSearchDepartment(formInline.value.departmentName)
-    const resultList = await execute()
-    if (resultList.data.value?.data.length == 0) {
-      ElMessage.warning('未找到匹配的专业')
+    const res = await searchDepartmentService(formInline.value.departmentName)
+    if (res.length == 0) {
+      message.warning('未找到匹配的专业')
     } else {
-      resultList.data.value && (departmentList.value = resultList.data.value?.data)
+      departmentList.value = res
     }
   } catch (e: any) {
-    ElMessage.error('搜索失败: ' + e.message)
+    message.error('搜索失败: ' + e.message)
   }
+}
+
+// 重置所有专业
+const resetSearch = async () => {
+  // 清空搜索输入框
+  formInline.value.departmentName = ''
+  // 重新获取专业列表
+  const data = await useGet('admin/departments')
+  departmentStore.departmentsS.value = data as unknown as Department[]
 }
 
 // 删除专业
 const handleDelete = async (id: string) => {
   deleting.value = true
   try {
-    const { execute } = deleteDepartment(id)
-    const res = await execute()
-    if (res.data.value?.code == 200) {
-      ElMessage.success('删除成功')
-    } else ElMessage.error(res.data.value?.message)
-    // 刷新列表数据
-    getDepartment()
+    const res = await deleteDepartmentService(id)
+    message.success('删除成功')
   } catch (error: any) {
-    console.error(error)
-    ElMessage.error(error)
+    message.error('删除失败')
   } finally {
     deleting.value = false
   }
 }
 
-// 获取专业列表数据
-const getDepartment = async () => {
-  try {
-    const { data } = await getDepartmentList()
-    if (data.value?.data) {
-      departmentList.value = data.value.data
-    }
-    console.log(data)
-  } catch (e: any) {
-    ElMessage.error('获取数据失败:', e)
-  }
-}
-
+// 初始化
 onMounted(async () => {
-  getDepartment()
+  await departmentListService()
 })
 </script>
+
 <style scoped>
 ::v-deep .el-table .cell {
   text-align: center;
