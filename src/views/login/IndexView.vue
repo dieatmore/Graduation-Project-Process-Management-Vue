@@ -44,7 +44,6 @@ import { useMessage } from '@/components/message'
 import router from '@/router'
 import { loginService } from '@/services/LoginService'
 import type { User } from '@/types'
-import { Role } from '@/types'
 import { Lock } from '@element-plus/icons-vue'
 import type { FormInstance } from 'element-plus'
 import { ref } from 'vue'
@@ -59,31 +58,11 @@ const handleLogin = async () => {
   // loginService内跳转，如果try，catch，finally则路径变但页面不跳转
   const formRule = await formRef.value?.validate()
   if (!formRule) return
-  try {
-    loading.value = true
-    const resp = await loginService({
-      number: form.value.number,
-      password: form.value.password
-    })
-    const role = resp.headers.role
-    let path = ''
-    switch (role) {
-      case Role.ADMIN:
-        path = '/admin'
-        break
-      case Role.STUDENT:
-        path = '/student'
-        break
-      case Role.TEACHER:
-        path = '/teacher'
-        break
-    }
-    if (resp.data.code == 200) router.push(path)
-  } catch (err: any) {
-    message.error(err)
-  } finally {
-    loading.value = false
-  }
+  const path = await loginService({
+    number: form.value.number,
+    password: form.value.password
+  })
+  path && router.push(path)
 }
 
 // 表单验证规则

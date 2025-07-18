@@ -1,13 +1,8 @@
 import type { User } from '@/types'
-import { createGlobalState } from '@vueuse/core'
-import { ref } from 'vue'
+import { shallowRef } from 'vue'
 
-export const useUserStore = createGlobalState(() => {
-  const user = ref<User>()
+const UserS = shallowRef<User>()
+const clear = () => (UserS.value = undefined)
+const store = { UserS, clear }
 
-  const setUser = (userData: User) => {
-    user.value = userData
-  }
-
-  return { user, setUser }
-})
+export const useUserStore = () => store

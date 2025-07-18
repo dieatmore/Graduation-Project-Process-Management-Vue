@@ -30,10 +30,13 @@
   </el-dialog>
 </template>
 <script lang="ts" setup>
-import { addTeachers } from '@/api/admin'
+import { useMessage } from '@/components/message'
+import { addTeacherService } from '@/services/AdminService'
 import { ElMessage } from 'element-plus'
 import { ref } from 'vue'
 import * as XLSX from 'xlsx'
+
+const message = useMessage()
 
 const formRef = ref()
 const formLoading = ref(false)
@@ -59,8 +62,12 @@ const handleFileChange = async (file: any) => {
     fileData.value = XLSX.utils.sheet_to_json(firstSheet)
     fileData.value = fileData.value.map(item => ({
       number: item.账号,
-      name: item.姓名
-      // departmentId: departmentId.value
+      name: item.姓名,
+      teacher: {
+        A: item.A组,
+        C: item.C组,
+        total: item.数量
+      }
     }))
     console.log(fileData.value)
   } catch (err) {
@@ -74,21 +81,15 @@ const departmentId = ref() // 记录专业ID
 const submitFile = async () => {
   formLoading.value = true
   if (fileList.value.length == 0) {
-    ElMessage.error('请上传文件!')
+    message.error('请上传文件!')
     return
   }
   try {
-    const { execute } = addTeachers(fileData.value, departmentId.value)
-    // await axios.post('/api/import', fileData.value)
-    const res = await execute()
-    if (res.data.value?.code == 200) {
-      ElMessage.success('导入教师成功')
-    } else {
-      ElMessage.error('导入教师失败')
-    }
+    await addTeacherService(fileData.value, departmentId.value)
+    message.success('导入教师成功')
     dialogVisible.value = false
   } catch (error) {
-    ElMessage.error('导入教师失败')
+    message.error('导入教师失败')
   } finally {
     formLoading.value = false
   }
@@ -97,19 +98,18 @@ const submitFile = async () => {
 const open = async (id: string) => {
   dialogVisible.value = true
   departmentId.value = id
-  console.log(departmentId.value)
   formRef.value && formRef.value.clearFiles() // 清除上传历史
 }
 defineExpose({ open }) // 提供open方法
 
 // 上传错误提示
 const submitFormError = () => {
-  ElMessage.error('上传失败，请您重新上传！')
+  message.error('上传失败，请您重新上传！')
   formLoading.value = false
 }
 
 // 文件数超出提示
 const handleExceed = () => {
-  ElMessage.error('最多只能上传一个文件！')
+  message.error('最多只能上传一个文件！')
 }
 </script>

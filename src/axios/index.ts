@@ -1,21 +1,21 @@
+import { useMessage } from '@/components/message'
 import type { ResultVO } from '@/types'
 import axios from 'axios'
 
 axios.defaults.baseURL = '/api/'
-
-// Axios拦截器是全局配置，仅初始化一次，所以外部
-const tokenStorage = sessionStorage.getItem('token')
+const message = useMessage()
 
 // Axios请求配置：注入token
 axios.interceptors.request.use(
   req => {
-    const token = tokenStorage
+    const token = sessionStorage.getItem('token')
     if (token && req.headers) {
       req.headers.token = token
     }
     return req
   },
   error => {
+    message.error(error)
     return Promise.reject(error)
   }
 )

@@ -48,32 +48,29 @@
       </el-dialog>
     </div>
     <!-- 专业列表 -->
-    <div
+    <el-table
       class="w-full h-[85%] mt-8 bg-white border-gray shadow-sm rounded-xl"
-      style="border-width: 1px">
-      <el-table
-        :data="departmentList"
-        stripe
-        style="width: 100%"
-        height="680"
-        empty-text="暂无专业数据，请添加或刷新">
-        <el-table-column prop="id" label="专业ID" width="350" />
-        <el-table-column prop="name" label="专业名称" />
-        <el-table-column prop="updateTime" label="创建时间" width="350" :formatter="formatDate" />
-        <el-table-column label="操作" width="350">
-          <template #default="scope">
-            <el-button @click="openForm(scope.row.id)">
-              <Download style="width: 1em; height: 1em; margin-right: 4px" plain />
-              导入教师
-            </el-button>
-            <el-button type="danger" @click="handleDelete(scope.row.id)" :loading="deleting">
-              <DeleteFilled style="width: 1em; height: 1em; margin-right: 4px" />
-              删除
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-    </div>
+      :data="departmentList"
+      stripe
+      style="width: 100%; border-width: 1px"
+      height="690"
+      empty-text="暂无专业数据，请添加或刷新">
+      <el-table-column prop="id" label="专业ID" width="350" />
+      <el-table-column prop="name" label="专业名称" />
+      <el-table-column prop="updateTime" label="创建时间" width="350" :formatter="formatDate" />
+      <el-table-column label="操作" width="350">
+        <template #default="scope">
+          <el-button @click="openForm(scope.row.id)">
+            <Download style="width: 1em; height: 1em; margin-right: 4px" plain />
+            导入教师
+          </el-button>
+          <el-button type="danger" @click="handleDelete(scope.row.id)" :loading="deleting">
+            <DeleteFilled style="width: 1em; height: 1em; margin-right: 4px" />
+            删除
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
   </div>
   <TeacherFile ref="formRef" />
 </template>
@@ -97,7 +94,7 @@ const departmentStore = useDepartmentStore()
 
 // 直接绑定到 store 中的数据
 let departmentList = departmentStore.departmentsS
-console.log(departmentStore.departmentsS)
+
 const message = useMessage()
 const dialogFormVisible = ref(false)
 

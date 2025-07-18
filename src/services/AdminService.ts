@@ -1,7 +1,7 @@
 import { useDelete, useGet, usePost } from '@/axios'
 import { useMessage } from '@/components/message'
 import { useDepartmentStore } from '@/stores/DepartmentStore'
-import type { Department } from '@/types'
+import type { Department, User } from '@/types'
 
 const message = useMessage()
 
@@ -33,3 +33,30 @@ export const deleteDepartmentService = async (departmentId: string) => {
   departmentStore.departmentsS.value = data as unknown as Department[]
   return departmentStore.departmentsS
 }
+
+// 导入教师
+export const addTeacherService = async (teachers: User[], departmentId: string) => {
+  teachers.forEach(item => {
+    item.teacher = JSON.stringify(item.teacher)
+  })
+  const resp = await usePost(`admin/teachers/${departmentId}`, teachers)
+  return resp
+}
+
+// export const addTeachers = (params: any, departmentId: string) => {
+//   return useAxios<ResultVO<User>>(
+//     `admin/teachers/${departmentId}`,
+//     {
+//       method: 'POST',
+//       data: params.map((item: any) => ({
+//         name: item.name,
+//         number: item.number,
+//         password: ''
+//       }))
+//     },
+//     service,
+//     {
+//       immediate: false
+//     }
+//   )
+// }
