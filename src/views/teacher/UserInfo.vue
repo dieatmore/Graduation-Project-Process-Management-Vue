@@ -67,16 +67,53 @@
       <!-- 操作 -->
       <div class="relative px-4 pt-24">
         <div class="absolute right-8">
-          <el-button type="primary">修改密码</el-button>
-          <el-button type="success" class="button-info">添加详细信息</el-button>
+          <el-button type="primary" @click="openDialog1">修改密码</el-button>
+          <el-button type="success" class="button-info" @click="openDialog2">
+            更新详细信息
+          </el-button>
         </div>
       </div>
+
+      <!-- 修改密码dialog -->
+      <el-dialog v-model="dialogFormVisible1" title="修改密码" width="400">
+        <el-form :model="newUser.password">
+          <el-form-item label="新密码">
+            <el-input v-model="newUser.password" autocomplete="off" type="password" show-password />
+          </el-form-item>
+        </el-form>
+        <template #footer>
+          <span class="dialog-footer">
+            <el-button @click="dialogFormVisible1 = false">取消</el-button>
+            <el-button type="primary" @click="handleConfirm1" :loading="submitting">确认</el-button>
+          </span>
+        </template>
+      </el-dialog>
+
+      <!-- 更新信息dialog -->
+      <el-dialog v-model="dialogFormVisible2" title="更新详细信息" width="400">
+        <el-form :model="newUser.description">
+          <el-form-item label="详细信息">
+            <el-input v-model="newUser.description" autocomplete="off" type="textarea" :rows="4" />
+          </el-form-item>
+        </el-form>
+        <template #footer>
+          <span class="dialog-footer">
+            <el-button @click="dialogFormVisible2 = false">取消</el-button>
+            <el-button type="primary" @click="handleConfirm2" :loading="submitting">确认</el-button>
+          </span>
+        </template>
+      </el-dialog>
     </div>
   </div>
 </template>
 <script setup lang="ts">
 import { useMessage } from '@/components/message'
-import { departmentNameService } from '@/services/UserService'
+import router from '@/router'
+import {
+  departmentNameService,
+  updateDescriptionService,
+  updatePasswordService
+} from '@/services/UserService'
 import { useUserStore } from '@/stores/UserStore'
 import { onMounted, ref } from 'vue'
 
@@ -85,13 +122,58 @@ let user = userStore.UserS
 
 const message = useMessage()
 const departmentName = ref('')
+const dialogFormVisible1 = ref(false)
+const dialogFormVisible2 = ref(false)
+const submitting = ref(false)
 
+const newUser = ref({
+  password: '',
+  description: ''
+})
+
+// 获取部门名称
 const getDepartmentName = async () => {
   try {
     departmentName.value = await departmentNameService()
     console.log(departmentName.value)
   } catch (error) {
     message.error('部门名称错误')
+  }
+}
+
+// 打开弹窗1
+const openDialog1 = () => {
+  dialogFormVisible1.value = true
+  newUser.value.password = ''
+}
+
+// 打开弹窗2
+const openDialog2 = () => {
+  dialogFormVisible2.value = true
+  newUser.value.description = user.value?.description || ''
+}
+
+// 修改密码
+const handleConfirm1 = async () => {
+  submitting.value = true
+  const path = await updatePasswordService(newUser.value)
+  dialogFormVisible1.value = false
+  path &&
+    router.push(path).then(() => {
+      message.warning('请重新登录！')
+    })
+}
+
+// 修改详细信息
+const handleConfirm2 = async () => {
+  submitting.value = true
+  try {
+    await updateDescriptionService(newUser.value)
+    dialogFormVisible2.value = false
+  } catch (err: any) {
+    message.error(err)
+  } finally {
+    submitting.value = false
   }
 }
 

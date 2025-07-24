@@ -11,16 +11,14 @@
         </el-col>
         <el-col :span="6" :offset="5">
           <div class="flex items-center justify-center">
-            <div class="flex mt-2 justify-center items-center user-info">
+            <div class="flex mt-2 justify-center items-center user-info" @click="userInfo">
               <img src="@/assets/images/头像.png" alt="头像" class="object-cover h-5 ml-2" />
-              <span
-                style="margin-left: 10px; font-weight: bolder; font-size: larger"
-                @click="userInfo">
+              <span style="margin-left: 10px; font-weight: bolder; font-size: larger">
                 {{ user?.name }}
               </span>
             </div>
-            <div class="flex mt-2 justify-center items-center ml-12 logout">
-              <span @click="Logout" style="font-weight: bolder">退出登录</span>
+            <div @click="Logout" class="flex mt-2 justify-center items-center ml-12 logout">
+              <span style="font-weight: bolder">退出登录</span>
               <img src="@/assets/images/退出.png" alt="校徽" class="object-cover h-5 ml-2" />
             </div>
           </div>

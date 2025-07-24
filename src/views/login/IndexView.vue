@@ -62,7 +62,10 @@ const handleLogin = async () => {
     number: form.value.number,
     password: form.value.password
   })
-  path && router.push(path)
+  path &&
+    router.push(path).then(() => {
+      message.success('登录成功！')
+    })
 }
 
 // 表单验证规则

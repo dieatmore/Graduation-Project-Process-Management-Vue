@@ -8,6 +8,7 @@ const userStore = useUserStore()
 
 export const loginService = async (user: User) => {
   // 封装的usePost只返回resp.data.data，不包含token
+  let path = null
   try {
     const resp = await axios.post<ResultVO<User>>('login', user)
     const data = resp.data.data
@@ -17,9 +18,8 @@ export const loginService = async (user: User) => {
       message.error('登录错误')
     }
     sessionStorage.setItem('token', token)
-    sessionStorage.setItem('user', JSON.stringify(data))
+    userStore.setUser(data)
     userStore.UserS.value = data
-    let path = null
     if (role == Role.ADMIN) {
       path = '/admin'
       role = Role2.ADMIN
@@ -31,8 +31,9 @@ export const loginService = async (user: User) => {
       role = Role2.TEACHER
     }
     sessionStorage.setItem('role', role)
-    return path
   } catch (err: any) {
     message.error(err)
+  } finally {
+    return path
   }
 }
