@@ -164,12 +164,13 @@ const handleConfirm1 = async () => {
     })
 }
 
-// 修改详细信息
+// 更新详细信息
 const handleConfirm2 = async () => {
   submitting.value = true
   try {
     await updateDescriptionService(newUser.value)
     dialogFormVisible2.value = false
+    message.success('更新成功!')
   } catch (err: any) {
     message.error(err)
   } finally {
