@@ -91,8 +91,6 @@ import { onMounted, ref } from 'vue'
 import TeacherFile from './TeacherFile.vue'
 
 const departmentStore = useDepartmentStore()
-
-// 直接绑定到 store 中的数据
 let departmentList = departmentStore.departmentsS
 
 const message = useMessage()

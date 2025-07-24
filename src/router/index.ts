@@ -14,7 +14,13 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/teacher',
     component: () => import('@/views/teacher/IndexView.vue'),
-    meta: { role: Role2.TEACHER }
+    meta: { role: Role2.TEACHER },
+    children: [
+      {
+        path: '/userinfo',
+        component: () => import('@/views/teacher/UserInfo.vue')
+      }
+    ]
   },
   {
     path: '/admin',

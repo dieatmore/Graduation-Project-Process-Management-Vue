@@ -25,6 +25,7 @@ export interface User {
   password?: string
   groupNumber?: number
   role?: string
+  description?: string
   student?: string
   teacher?: string
   departmentId?: string

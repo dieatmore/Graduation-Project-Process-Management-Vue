@@ -17,6 +17,7 @@ export const loginService = async (user: User) => {
       message.error('登录错误')
     }
     sessionStorage.setItem('token', token)
+    sessionStorage.setItem('user', JSON.stringify(data))
     userStore.UserS.value = data
     let path = null
     if (role == Role.ADMIN) {
