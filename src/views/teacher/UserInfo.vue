@@ -164,7 +164,7 @@ const handleConfirm1 = async () => {
     })
 }
 
-// 更新详细信息
+// 更新信息
 const handleConfirm2 = async () => {
   submitting.value = true
   try {
